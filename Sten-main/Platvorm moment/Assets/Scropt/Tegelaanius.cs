@@ -2,18 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tegelaanius : MonoBehaviour
+public class Tegelaanius : Damage
 {
-
+  
+    private Vector3 dir;
     public float speed = 3f;
     public int lives = 5;
-    public float jumpForce = 0.5f;
+    public float jumpForce = 0.1f;
 
     private Rigidbody2D rb;
     private SpriteRenderer sprite;
     private Animator anim;
 
     private bool isGrounded = false;
+
+    public static Tegelaanius Instance { get; set; }
+
+    public override void GetDamage()
+    {
+        lives -= 1;
+        Debug.Log(lives);
+
+        if (lives < 1)
+        {
+            //Die();
+        }
+    }
 
 
     private void Awake()
@@ -22,10 +36,13 @@ public class Tegelaanius : MonoBehaviour
         sprite = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
+        Instance = this;
     }
 
     private void Run()
     {
+
+        if (isGrounded) State = States.run;
 
 
         Vector3 dir = transform.right * Input.GetAxis("Horizontal");
@@ -46,10 +63,18 @@ public class Tegelaanius : MonoBehaviour
     private void Jump()
     {
         rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);
+
+        if (!isGrounded) State = States.jump;
+
     }
 
-    
 
+
+    private States State
+    {
+        get { return (States)anim.GetInteger("state"); }
+        set { anim.SetInteger("state", (int)value); }
+    }
 
 
 
@@ -64,6 +89,7 @@ public class Tegelaanius : MonoBehaviour
     void Update()
     {
 
+        if (isGrounded) State = States.idle;
 
 
         if (Input.GetButton("Horizontal"))
@@ -85,3 +111,13 @@ public class Tegelaanius : MonoBehaviour
     }
 
 }
+
+public enum States
+{
+    idle,
+    run,
+    jump
+}
+
+
+
