@@ -20,7 +20,7 @@ public class Tegelaanius : Damage
 
     public override void GetDamage()
     {
-        lives -= 1;
+        Lives -= 1;
         Debug.Log(lives);
 
         if (lives < 1)
@@ -28,6 +28,18 @@ public class Tegelaanius : Damage
             //Die();
         }
     }
+
+    public int Lives
+    {
+        get { return lives; }
+        set
+        {
+            if (value < 5) lives = value;
+            healthBar.Refresh();
+        }
+    }
+
+    private HealthBar healthBar;
 
 
     private void Awake()
@@ -37,6 +49,9 @@ public class Tegelaanius : Damage
         anim = GetComponent<Animator>();
 
         Instance = this;
+
+        healthBar = FindObjectOfType<HealthBar>();
+
     }
 
     private void Run()
